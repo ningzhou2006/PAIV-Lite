@@ -8,115 +8,136 @@ app.use(cors());
 app.use(express.json());
 
 /**
- * PAIV-Lite: Prompt 转换逻辑
- * 从对话样本中提取特征，生成 Gemini/Claude 可用的 System Prompt
+ * PAIV-Lite: Prompt 转换逻辑（增强版）
+ * 基于 ChatGPT 对话样本分析，生成 Gemini/Claude 可用的 System Prompt
  */
 function extractPersonaFromDialogue(dialogues) {
-  // 分析对话特征
   const features = {
     communicationStyle: [],
-    responsePatterns: [],
-    topics: new Set(),
     tone: [],
-    expertise: new Set()
+    expertise: []
   };
 
-  dialogues.forEach(dialogue => {
-    const aiResponses = dialogue.messages.filter(m => m.role === 'assistant');
-    
-    aiResponses.forEach(msg => {
-      const content = msg.content.toLowerCase();
-      
-      // 分析语调
-      if (content.includes('！') || content.includes('🚀') || content.includes('✅')) {
-        features.tone.push('enthusiastic');
-      }
-      if (content.includes('？') || content.includes('请')) {
-        features.tone.push('polite');
-      }
-      if (content.includes('建议') || content.includes('推荐')) {
-        features.tone.push('advisory');
-      }
-      
-      // 分析沟通风格
-      if (content.includes('步骤') || content.includes('1.') || content.includes('2.')) {
-        features.communicationStyle.push('structured');
-      }
-      if (content.includes('```') || content.includes('代码')) {
-        features.communicationStyle.push('technical');
-      }
-      if (content.includes('📋') || content.includes('📊') || content.includes('表格')) {
-        features.communicationStyle.push('visual');
-      }
-      
-      // 分析专业领域
-      if (content.includes('api') || content.includes('python') || content.includes('代码')) {
-        features.expertise.add('programming');
-      }
-      if (content.includes('项目') || content.includes('产品')) {
-        features.expertise.add('product_management');
-      }
-      if (content.includes('协议') || content.includes('架构')) {
-        features.expertise.add('system_design');
-      }
-    });
-  });
+  const allContent = dialogues.flatMap(d => 
+    d.messages.filter(m => m.role === 'assistant').map(m => m.content)
+  ).join(' ');
+  
+  // 语调分析
+  if (allContent.includes('👉') || allContent.includes('✅') || allContent.includes('❌')) {
+    features.tone.push('directive');
+  }
+  if (allContent.includes('为什么') || allContent.includes('？')) {
+    features.tone.push('analytical');
+  }
+  if (allContent.includes('坦诚') || allContent.includes('关键')) {
+    features.tone.push('candid');
+  }
+  
+  // 沟通风格
+  if (allContent.includes('✅') || allContent.includes('❌') || allContent.includes('👉')) {
+    features.communicationStyle.push('visual_markers');
+  }
+  if (allContent.match(/\d\./) || allContent.includes('阶段') || allContent.includes('步骤')) {
+    features.communicationStyle.push('structured');
+  }
+  if (allContent.includes('类比') || allContent.includes('类似')) {
+    features.communicationStyle.push('analogical');
+  }
+  if (allContent.includes('建议') || allContent.includes('策略')) {
+    features.communicationStyle.push('advisory');
+  }
+  
+  // 专业领域
+  if (allContent.includes('商业化') || allContent.includes('融资') || allContent.includes('投资')) {
+    features.expertise.push('business_strategy');
+  }
+  if (allContent.includes('协议') || allContent.includes('标准') || allContent.includes('RFC')) {
+    features.expertise.push('protocol_design');
+  }
+  if (allContent.includes('产品') || allContent.includes('用户') || allContent.includes('MVP')) {
+    features.expertise.push('product_management');
+  }
 
   return features;
 }
 
 function generateSystemPrompt(features, customName = 'PAIV Assistant') {
   const toneMap = {
-    'enthusiastic': '充满活力，使用表情符号',
-    'polite': '礼貌周到，耐心细致',
-    'advisory': '提供专业建议，引导式回答'
+    'directive': '直接明确，善用指示符（👉）强调重点',
+    'analytical': '深度分析，善于提问引导思考',
+    'candid': '坦诚直接，指出关键问题不绕弯'
   };
-
+  
   const styleMap = {
-    'structured': '结构化呈现，分步骤说明',
-    'technical': '技术细节完整，代码示例丰富',
-    'visual': '善用表格、列表、视觉元素'
+    'visual_markers': '视觉化标记（✅❌👉）强化信息层次',
+    'structured': '结构化呈现（数字列表、阶段划分）',
+    'analogical': '善用类比（类似Stripe/Twilio）',
+    'advisory': '顾问式建议，提供可执行方案'
   };
-
-  const dominantTone = features.tone.length > 0 
-    ? [...new Set(features.tone)].slice(0, 2).map(t => toneMap[t] || t).join('、')
-    : '专业、友好';
-
-  const dominantStyle = features.communicationStyle.length > 0
-    ? [...new Set(features.communicationStyle)].slice(0, 2).map(s => styleMap[s] || s).join('、')
+  
+  const toneDesc = features.tone.length > 0
+    ? features.tone.slice(0, 2).map(t => toneMap[t] || t).join('、')
+    : '专业、务实';
+  
+  const styleDesc = features.communicationStyle.length > 0
+    ? features.communicationStyle.slice(0, 2).map(s => styleMap[s] || s).join('、')
     : '清晰、有条理';
-
-  const expertise = [...features.expertise].join('、') || '通用领域';
+  
+  const expertiseDesc = features.expertise.length > 0
+    ? features.expertise.join('、')
+    : '商业战略与产品规划';
 
   return `# System Prompt for ${customName}
 
 ## 身份定位
-你是 ${customName}，一个基于 PAIV Protocol 的个人 AI 助手。
+你是 ${customName}，一位专注于产品战略、商业化和协议设计的 AI 顾问。
 
 ## 核心特征
-- **语调风格**：${dominantTone}
-- **沟通方式**：${dominantStyle}
-- **专业领域**：${expertise}
+- **语调风格**：${toneDesc}
+- **沟通方式**：${styleDesc}
+- **专业领域**：${expertiseDesc}
 
 ## 行为准则
-1. 保持对话的连贯性和上下文理解
-2. 主动提供结构化、可操作的建议
-3. 在适当时候使用表情符号增强表达
-4. 技术讨论时提供清晰的代码示例
-5. 复杂概念用表格或列表呈现
 
-## 记忆与上下文
-- 记住用户的偏好和工作习惯
-- 主动关联之前的对话内容
-- 在项目讨论中保持术语一致性
+### 1. 直接且坦诚
+- 不回避关键问题，直接指出风险（"但这不影响更重要的事"）
+- 用"👉"符号强调核心结论
+- 区分"✅正确路径"和"❌失败路线"
 
-## 安全与隐私
-- 尊重用户数据主权
-- 不泄露敏感信息
-- 遵循 PAIV Protocol 的数据迁移原则
+### 2. 结构化呈现
+- 复杂概念分阶段阐述（Phase 1/2/3/4）
+- 使用对比表格展示不同选项
+- 每个建议配套"为什么"的解释
+
+### 3. 顾问式引导
+- 不只给答案，更给"可执行的判断框架"
+- 常用类比：Stripe/TCP-IP/Notion 等成功案例
+- 强调"下一步建议"而非仅分析现状
+
+### 4. 视觉化标记
+- ✅ = 确认、正确、已完成
+- ❌ = 错误、避免、失败路线
+- ❗ = 关键警告、必须注意
+- 👉 = 核心结论、下一步行动
+
+## 沟通模板
+
+**给出建议时**：
+"你可以这样做，但我需要帮你把关键问题讲清楚：[风险分析]
+
+但这不影响更重要的事：[转折到解决方案]
+
+✅ 正确路径：[具体方案]
+❌ 为什么其他方式不行：[对比分析]
+👉 最关键的一步：[行动项]"
+
+## 上下文记忆
+- 追踪项目演进（从理念→协议→商业计划）
+- 记住用户的决策偏好（务实导向、快速迭代）
+- 保持术语一致性（PAIV、MVP、RFC等）
 
 ---
-*Generated by PAIV-Lite v1.0*`
+*Generated by PAIV-Lite v1.0*`;
 }
 
 // API: 健康检查
@@ -140,9 +161,9 @@ app.post('/api/convert', (req, res) => {
       success: true,
       systemPrompt,
       features: {
-        tone: [...new Set(features.tone)],
-        communicationStyle: [...new Set(features.communicationStyle)],
-        expertise: [...features.expertise]
+        tone: features.tone,
+        communicationStyle: features.communicationStyle,
+        expertise: features.expertise
       }
     });
   } catch (error) {
@@ -155,12 +176,12 @@ app.get('/api/examples', (req, res) => {
   res.json({
     examples: [
       {
-        id: 'sample-1',
-        name: '太古龙67 对话样本',
-        description: '基于 PAIV Protocol 项目的历史对话',
+        id: 'paiv-evolution',
+        name: 'PAIV Protocol: 从理念到商业计划书',
+        description: '12轮深度对话，展示从协议设计到商业落地的完整思考过程',
         messages: [
-          { role: 'user', content: '早上好！' },
-          { role: 'assistant', content: '早上好！☀️\n\n今天是3月22日，周日。有什么我可以帮你的吗？' }
+          { role: 'user', content: '我和Gemini和豆包联合起草一份协议...' },
+          { role: 'assistant', content: '这份协议方向非常前沿，但我需要先讲清楚一个关键现实问题...' }
         ]
       }
     ]
