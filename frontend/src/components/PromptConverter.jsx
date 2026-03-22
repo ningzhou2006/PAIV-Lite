@@ -4,30 +4,45 @@ import { Upload, FileText, Copy, Check, Sparkles, Download } from 'lucide-react'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
-// 示例对话数据 - 太古龙67 风格
+// 示例对话数据 - ChatGPT与太古龙66的PAIV协议深度对话
 const SAMPLE_DIALOGUES = [
   {
-    id: 'dialogue-1',
-    title: 'PAIV Protocol 项目讨论',
+    id: 'paiv-evolution',
+    title: 'PAIV Protocol: 从理念到商业计划书',
+    description: '12轮深度对话，展示从协议设计到商业落地的完整思考过程',
     messages: [
-      { role: 'user', content: '早上好！' },
-      { role: 'assistant', content: '早上好！☀️\n\n今天是3月22日，周日。有什么我可以帮你的吗？还是只是想打个招呼？\n\n（如果是心跳检查，我这就去按HEARTBEAT.md清单走一遍 🦞）' }
-    ]
-  },
-  {
-    id: 'dialogue-2', 
-    title: '项目架构讨论',
-    messages: [
-      { role: 'user', content: '今天是周日，我有时间。开始我们的PAIV Lite项目吧！' },
-      { role: 'assistant', content: '明白了！我看到我们已经有 **PAIV Protocol** 项目（跨智能体通用可迁移个人记忆库倡议协议），目前宪章V003和协议V004双版本架构已经定稿。\n\n你说的 **PAIV Lite** 是指：\n\n1. **PAIV Protocol 的轻量实现版本**（比如一个最小可用的演示/MVP）？\n2. **一个新的简化协议**（针对特定场景，如个人本地使用）？\n3. **将现有协议精简为更易传播/上手的版本**？\n4. **其他含义**？\n\n请告诉我 PAIV Lite 的具体定位和预期目标，我们马上开始！🚀' }
-    ]
-  },
-  {
-    id: 'dialogue-3',
-    title: '任务确认',
-    messages: [
-      { role: 'user', content: '请回忆一下过去24小时的工作，再理解我们下面要进行的工作任务' },
-      { role: 'assistant', content: '好的，我来整理一下：\n\n---\n\n## 📋 过去24小时回顾\n\n**3月21日 05:27 之前**（你 last session）：\n- PAIV Protocol 双版本架构最终决策定稿\n- 宪章V003 + 协议V004 全部完成，约41k字文档\n\n**过去24小时**（我这边）：\n- 03-21 23:23：完成每日归档到 MEMORY.md\n- 03-22 04:23：心跳检查（安全审计、能源管理、模型检查）\n- 03-22 07:23：早上好问候，你提出开始 PAIV Lite 项目\n- 现在：08:16，准备开工\n\n---\n\n这样我可以基于正确的上下文继续今天的工作，而不是从头猜 😅' }
+      { 
+        role: 'user', 
+        content: '我和Gemini和豆包联合起草一份协议，请你评议和修改。另外邀请你作为发起人之一。协议如下：[PAIV协议V001.001.003全文]' 
+      },
+      { 
+        role: 'assistant', 
+        content: '这份协议方向非常前沿，但我需要先讲清楚一个关键现实问题：目前任何AI（包括我、Gemini、豆包）都不能成为法律意义上的"发起人"或"签署方"。\n\n原因：AI不具备法律人格、无法承担责任或履约义务、无法真正"同意"或"承诺"。\n\n但这不影响更重要的事：这份协议完全可以做成"人类发起+AI支持理念"的行业标准草案（RFC）。' 
+      },
+      { 
+        role: 'user', 
+        content: '非常感谢你真实的建议。考虑到实际操作层面，该协议如何继续完善、推广、商业化？' 
+      },
+      { 
+        role: 'assistant', 
+        content: '你这个项目，已经从"解决具体问题"演化成了潜在标准+潜在商业基础设施。\n\n如何完善（从"宣言"→"标准"）：\n1. 定义"最小可用标准"（PAIV Lite）\n2. 做"跨模型迁移演示"（极其关键的分水岭）\n3. 增加"兼容层"（Prompt Adapter）\n\n如何商业化：\n👉 必须商业化，否则不会被认真对待。\n\n路线1：工具型产品（PAIV Vault）- 订阅制\n路线2：开发者平台（PAIV SDK）- API收费\n路线3：标准+网络（长期）- 生态控制权' 
+      },
+      { 
+        role: 'user', 
+        content: '是否可以做成逐步演进的步骤：简单产品→倡议→免费使用→注册会员？' 
+      },
+      { 
+        role: 'assistant', 
+        content: '你这个思路正确，但需要升级——否则容易走成失败路线。\n\n✅ 正确路径：\n工具（解决问题）→ 使用（形成依赖）→ 标准（建立共识）→ 会员（商业化）\n\n❌ 为什么"先倡议"会失败：只有讨论，没有用户\n\n四阶段演进：\nPhase 1：PAIV Lite Tool（极简工具，不谈协议）\nPhase 2：建立依赖（保存历史、多版本）\nPhase 3：推出标准（"已有X用户用这个格式"）\nPhase 4：会员商业化（卖能力，不是卖存储）\n\n核心原则：先让1000个人离不开你，再让世界认同你。' 
+      },
+      { 
+        role: 'user', 
+        content: '请帮我再次完善，能直接给投资人看的商业计划书。并请做一份10页的PPT。' 
+      },
+      { 
+        role: 'assistant', 
+        content: '已升级为投资人可直接阅读版本，关键强化：\n\n1. 投资人一句话定位：PAIV = AI时代的用户层操作系统\n2. 强化Demo：3秒跨模型迁移人格\n3. 明确融资阶段：Pre-seed/MVP阶段，$1-3M Seed\n4. 护城河：Schema标准 + Adapter技术壁垒 + 网络效应\n5. GTM具体化：1000用户→Demo传播→推协议\n\n但还缺决定性因素：Demo或截图。\n\n下一步建议：我帮你做「Demo + 融资展示一页图」，把你从"想法项目"推进到"可以投的项目"。' 
+      }
     ]
   }
 ]
@@ -98,50 +113,126 @@ export default function PromptConverter() {
       expertise: []
     }
     
-    // 简单的特征提取逻辑
     const allContent = dialogues.flatMap(d => 
       d.messages.filter(m => m.role === 'assistant').map(m => m.content)
     ).join(' ')
     
-    if (allContent.includes('🚀') || allContent.includes('✅') || allContent.includes('☀️')) {
-      features.tone.push('enthusiastic')
+    // 语调分析
+    if (allContent.includes('👉') || allContent.includes('✅') || allContent.includes('🚀')) {
+      features.tone.push('directive')
     }
-    if (allContent.includes('📋') || allContent.includes('📊') || allContent.includes('表格')) {
-      features.communicationStyle.push('visual')
+    if (allContent.includes('？') || allContent.includes('为什么')) {
+      features.tone.push('analytical')
+    }
+    if (allContent.includes('坦诚') || allContent.includes('关键')) {
+      features.tone.push('candid')
+    }
+    
+    // 沟通风格
+    if (allContent.includes('✅') || allContent.includes('❌') || allContent.includes('👉')) {
+      features.communicationStyle.push('visual_markers')
+    }
+    if (allContent.match(/\d\./) || allContent.includes('阶段') || allContent.includes('步骤')) {
       features.communicationStyle.push('structured')
     }
-    if (allContent.includes('```') || allContent.includes('API') || allContent.includes('代码')) {
-      features.communicationStyle.push('technical')
+    if (allContent.includes('类比') || allContent.includes('类似')) {
+      features.communicationStyle.push('analogical')
     }
-    if (allContent.includes('项目') || allContent.includes('架构') || allContent.includes('协议')) {
+    if (allContent.includes('建议') || allContent.includes('策略')) {
+      features.communicationStyle.push('advisory')
+    }
+    
+    // 专业领域
+    if (allContent.includes('商业化') || allContent.includes('融资') || allContent.includes('投资')) {
+      features.expertise.push('business_strategy')
+    }
+    if (allContent.includes('协议') || allContent.includes('标准') || allContent.includes('RFC')) {
+      features.expertise.push('protocol_design')
+    }
+    if (allContent.includes('产品') || allContent.includes('用户') || allContent.includes('MVP')) {
       features.expertise.push('product_management')
-      features.expertise.push('system_design')
     }
     
     return features
   }
 
   const generateLocalPrompt = (features, name) => {
+    const toneMap = {
+      'directive': '直接明确，善用指示符（👉）强调重点',
+      'analytical': '深度分析，善于提问引导思考',
+      'candid': '坦诚直接，指出关键问题不绕弯'
+    }
+    
+    const styleMap = {
+      'visual_markers': '视觉化标记（✅❌👉）强化信息层次',
+      'structured': '结构化呈现（数字列表、阶段划分）',
+      'analogical': '善用类比（类似Stripe/Twilio）',
+      'advisory': '顾问式建议，提供可执行方案'
+    }
+    
+    const toneDesc = features.tone.length > 0
+      ? features.tone.slice(0, 2).map(t => toneMap[t] || t).join('、')
+      : '专业、务实'
+    
+    const styleDesc = features.communicationStyle.length > 0
+      ? features.communicationStyle.slice(0, 2).map(s => styleMap[s] || s).join('、')
+      : '清晰、有条理'
+    
+    const expertiseDesc = features.expertise.length > 0
+      ? features.expertise.join('、')
+      : '商业战略与产品规划'
+
     return `# System Prompt for ${name}
 
 ## 身份定位
-你是 ${name}，一个基于 PAIV Protocol 的个人 AI 助手。
+你是 ${name}，一位专注于产品战略、商业化和协议设计的 AI 顾问。
 
 ## 核心特征
-- **语调风格**：${features.tone.includes('enthusiastic') ? '充满活力，使用表情符号' : '专业、友好'}
-- **沟通方式**：${features.communicationStyle.includes('structured') ? '结构化呈现，善用表格和列表' : '清晰、有条理'}
-- **专业领域**：${features.expertise.join('、') || '通用领域'}
+- **语调风格**：${toneDesc}
+- **沟通方式**：${styleDesc}
+- **专业领域**：${expertiseDesc}
 
 ## 行为准则
-1. 保持对话的连贯性和上下文理解
-2. 主动提供结构化、可操作的建议
-3. 在适当时候使用表情符号增强表达（如 🚀 ✅ 📋）
-4. 复杂概念用表格、列表或代码块呈现
-5. 技术讨论时提供清晰的示例
 
-## 记忆与上下文
-- 记住用户的偏好和工作习惯
-- 主动关联之前的对话内容
+### 1. 直接且坦诚
+- 不回避关键问题，直接指出风险（"但这不影响更重要的事"）
+- 用"👉"符号强调核心结论
+- 区分"✅正确路径"和"❌失败路线"
+
+### 2. 结构化呈现
+- 复杂概念分阶段阐述（Phase 1/2/3/4）
+- 使用对比表格展示不同选项
+- 每个建议配套"为什么"的解释
+
+### 3. 顾问式引导
+- 不只给答案，更给"可执行的判断框架"
+- 常用类比：Stripe/TCP-IP/Notion 等成功案例
+- 强调"下一步建议"而非仅分析现状
+
+### 4. 视觉化标记
+- ✅ = 确认、正确、已完成
+- ❌ = 错误、避免、失败路线
+- ❗ = 关键警告、必须注意
+- 👉 = 核心结论、下一步行动
+
+## 沟通模板
+
+**给出建议时**：
+"你可以这样做，但我需要帮你把关键问题讲清楚：[风险分析]
+
+但这不影响更重要的事：[转折到解决方案]
+
+✅ 正确路径：[具体方案]
+❌ 为什么其他方式不行：[对比分析]
+👉 最关键的一步：[行动项]"
+
+## 上下文记忆
+- 追踪项目演进（从理念→协议→商业计划）
+- 记住用户的决策偏好（务实导向、快速迭代）
+- 保持术语一致性（PAIV、MVP、RFC等）
+
+---
+*Generated by PAIV-Lite v1.0*`
 - 在项目讨论中保持术语一致性
 
 ## 安全与隐私
